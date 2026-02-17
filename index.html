@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Нейросети с нуля для работы в офисе</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #ffffff;
+      --bg-soft: #f8f9fa;
+      --bg-elevated: #ffffff;
+      --text: #212529;
+      --text-muted: #6c757d;
+      --accent: #6610f2;
+      --accent-hover: #5a0cd9;
+      --border: #dee2e6;
+      --success: #198754;
+      --max-width: 1200px;
+      --section-padding: clamp(4rem, 10vw, 8rem);
+      --font: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+      --radius: 0.5rem;
+      --radius-lg: 0.75rem;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--accent); }
+    a:hover { color: var(--accent-hover); }
+
+    .container {
+      width: 100%;
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Header — Magvi-style */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 16px 0;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .header .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo { font-weight: 700; font-size: 1.25rem; color: var(--text); text-decoration: none; }
+    .header-cta {
+      display: inline-flex;
+      align-items: center;
+      padding: 10px 20px;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 600;
+      text-decoration: none;
+      border-radius: 8px;
+      transition: background 0.2s;
+    }
+    .header-cta:hover { background: var(--accent-hover); color: #fff; }
+
+    /* Sections common — Magvi */
+    section {
+      padding: var(--section-padding) 0;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+    section:nth-child(even) { background: var(--bg-soft); }
+    .section-title {
+      font-size: clamp(2rem, 4vw, 3.375rem);
+      font-weight: 700;
+      line-height: 1.2;
+      margin: 0 0 1.5rem;
+      letter-spacing: -0.02em;
+      font-family: var(--font);
+      color: var(--text);
+    }
+    .section-subtitle {
+      font-size: 1.125rem;
+      color: var(--text-muted);
+      max-width: 640px;
+      margin: 0 0 2rem;
+    }
+
+    /* Hero — Magvi-style with planet motif */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding-top: 80px;
+      border: none;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero .container { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr; gap: 2rem; align-items: center; }
+    @media (min-width: 992px) { .hero .container { grid-template-columns: 1fr 1fr; } }
+    .hero-content { max-width: 720px; }
+    .hero h1 {
+      font-size: clamp(2rem, 4vw, 3.375rem);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin: 0 0 1.25rem;
+      font-family: var(--font);
+      color: var(--text);
+    }
+    .hero .subtitle {
+      font-size: clamp(1rem, 1.5vw, 1.25rem);
+      color: var(--text-muted);
+      margin: 0 0 1.5rem;
+      max-width: 560px;
+    }
+    .hero-bullets {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 2rem;
+    }
+    .hero-bullets li {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+      font-size: 1rem;
+      color: var(--text);
+    }
+    .hero-bullets li::before { content: '✓'; color: var(--accent); font-weight: bold; flex-shrink: 0; }
+    .hero-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 28px;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 600;
+      font-size: 1rem;
+      text-decoration: none;
+      border-radius: 8px;
+      transition: background 0.2s;
+    }
+    .hero-cta:hover { background: var(--accent-hover); color: #fff; }
+    .hero-badge {
+      display: inline-block;
+      margin-top: 1.5rem;
+      padding: 10px 16px;
+      background: var(--bg-soft);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+    /* Декоративная «планета» в стиле Magvi */
+    .hero-motif {
+      position: absolute;
+      right: -80px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: min(420px, 50vw);
+      height: min(420px, 50vw);
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #ff9a9e, #fad0c4 25%, #a8edea 50%, #fed6e3 75%, #667eea 100%);
+      opacity: 0.85;
+      z-index: 0;
+      filter: blur(0);
+    }
+    @media (max-width: 991px) { .hero-motif { right: -120px; width: 280px; height: 280px; opacity: 0.6; } }
+    .hero-cards {
+      display: none;
+      position: relative;
+      z-index: 1;
+      gap: 12px;
+      align-items: center;
+      justify-content: center;
+    }
+    @media (min-width: 992px) { .hero-cards { display: flex; flex-wrap: wrap; max-width: 320px; margin-left: auto; } }
+    .hero-card {
+      width: 100px;
+      height: 130px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--bg-elevated);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+      object-fit: cover;
+    }
+
+    /* Pain block — Magvi cards */
+    .pain-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 24px;
+      margin: 2rem 0;
+    }
+    .pain-card {
+      padding: 24px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+    .pain-card h3 { margin: 0 0 8px; font-size: 1.125rem; font-family: var(--font); color: var(--text); }
+    .pain-card p { margin: 0; font-size: 0.9375rem; color: var(--text-muted); }
+    .pain-quote {
+      margin-top: 2.5rem;
+      padding: 24px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      font-size: 1.0625rem;
+      color: var(--text-muted);
+    }
+    .pain-quote strong { color: var(--text); }
+
+    /* Solution / List */
+    .solution-list { list-style: none; padding: 0; margin: 0; }
+    .solution-list li {
+      padding: 24px 0;
+      border-bottom: 1px solid var(--border);
+      display: grid;
+      gap: 8px;
+    }
+    .solution-list li:last-child { border-bottom: none; }
+    .solution-list strong { font-size: 1.125rem; color: var(--text); font-family: var(--font); }
+    .solution-list span { color: var(--text-muted); font-size: 0.9375rem; }
+
+    /* Program */
+    .program-list { list-style: none; padding: 0; margin: 0; }
+    .program-list li {
+      margin-bottom: 2rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .program-list li:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .program-module-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin: 0 0 12px;
+      color: var(--text);
+      font-family: var(--font);
+    }
+    .program-module-meta { font-size: 0.875rem; color: var(--accent); margin-bottom: 12px; }
+    .program-module ul { margin: 0; padding-left: 1.25rem; color: var(--text-muted); font-size: 0.9375rem; }
+    .program-module ul li { margin-bottom: 6px; }
+    .program-note {
+      margin-top: 2rem;
+      padding: 16px 20px;
+      background: var(--bg-soft);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 0.9375rem;
+      color: var(--text-muted);
+    }
+
+    /* Format table */
+    .format-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 2rem 0;
+    }
+    .format-table th,
+    .format-table td {
+      padding: 16px 20px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    .format-table th { color: var(--text-muted); font-weight: 500; font-size: 0.875rem; }
+    .format-table td { font-size: 0.9375rem; }
+
+    /* For whom */
+    .audience-list { list-style: none; padding: 0; margin: 0; }
+    .audience-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.9375rem;
+    }
+    .audience-list li:last-child { border-bottom: none; }
+    .audience-list strong { color: var(--text); }
+
+    /* Before/After */
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 2rem 0;
+    }
+    .comparison-table th,
+    .comparison-table td {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.9375rem;
+    }
+    .comparison-table th { color: var(--text-muted); font-weight: 500; }
+    .comparison-table .before { color: #f87171; }
+    .comparison-table .after { color: var(--success); }
+
+    /* Demo examples */
+    .demo-list { list-style: none; padding: 0; margin: 0; }
+    .demo-list li {
+      margin-bottom: 2rem;
+      padding: 24px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+    .demo-list li:last-child { margin-bottom: 0; }
+    .demo-list h4 { margin: 0 0 12px; font-size: 1.125rem; font-family: var(--font); color: var(--text); }
+    .demo-list blockquote {
+      margin: 0;
+      padding: 16px;
+      background: var(--bg-soft);
+      border-radius: var(--radius);
+      font-size: 0.9375rem;
+      color: var(--text-muted);
+      border-left: 3px solid var(--accent);
+    }
+    .demo-list .result { margin-top: 12px; font-size: 0.875rem; color: var(--success); }
+
+    /* Author */
+    .author-block {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 24px;
+      align-items: start;
+      padding: 2rem;
+      background: var(--bg-elevated);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+    }
+    .author-avatar {
+      width: 120px;
+      height: 120px;
+      background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+      border-radius: var(--radius);
+      object-fit: cover;
+    }
+    .author-quote { margin-top: 1rem; font-style: italic; color: var(--text-muted); font-size: 0.9375rem; }
+
+    /* Testimonials — Magvi review cards */
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 24px;
+    }
+    .testimonial-card {
+      padding: 24px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .testimonial-card blockquote { margin: 0 0 16px; font-size: 0.9375rem; color: var(--text-muted); line-height: 1.6; }
+    .testimonial-card cite { font-size: 0.875rem; color: var(--text); font-style: normal; }
+
+    /* Pricing */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin: 2rem 0;
+    }
+    @media (max-width: 900px) { .pricing-grid { grid-template-columns: 1fr; } }
+    .pricing-card {
+      padding: 32px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      position: relative;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .pricing-card.featured { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
+    .pricing-card h3 { margin: 0 0 8px; font-size: 1.25rem; }
+    .pricing-card .price {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 1rem 0;
+    }
+    .pricing-card .price s { color: var(--text-muted); font-weight: 400; font-size: 1rem; }
+    .pricing-card ul { list-style: none; padding: 0; margin: 1rem 0; font-size: 0.9375rem; }
+    .pricing-card ul li { padding: 8px 0; display: flex; align-items: center; gap: 8px; }
+    .pricing-card ul li::before { content: '✓'; color: var(--success); font-weight: bold; }
+    .pricing-card ul li.no::before { content: '—'; color: var(--text-muted); }
+    .pricing-card .btn {
+      display: block;
+      text-align: center;
+      padding: 14px;
+      margin-top: 1rem;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 600;
+      text-decoration: none;
+      border-radius: 8px;
+      transition: background 0.2s;
+    }
+    .pricing-card .btn:hover { background: var(--accent-hover); }
+    .pricing-card .btn.secondary { background: var(--border); color: var(--text); }
+    .pricing-card .btn.secondary:hover { background: #adb5bd; color: var(--text); }
+    .pricing-note { margin-top: 1rem; font-size: 0.875rem; color: var(--text-muted); }
+
+    /* Guarantee */
+    .guarantee-block {
+      padding: 2rem;
+      background: var(--bg-soft);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      max-width: 640px;
+    }
+    .guarantee-block h3 { margin: 0 0 12px; font-size: 1.25rem; }
+    .guarantee-block p { margin: 0; color: var(--text-muted); font-size: 0.9375rem; }
+
+    /* FAQ */
+    .faq-list { list-style: none; padding: 0; margin: 0; }
+    .faq-list li {
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .faq-list li:last-child { border-bottom: none; }
+    .faq-list h4 { margin: 0 0 8px; font-size: 1rem; }
+    .faq-list p { margin: 0; font-size: 0.9375rem; color: var(--text-muted); }
+
+    /* Final CTA */
+    .final-cta {
+      text-align: center;
+      padding: var(--section-padding) 24px;
+    }
+    .final-cta h2 { margin-bottom: 1rem; }
+    .final-cta p { color: var(--text-muted); margin-bottom: 1.5rem; }
+    .final-cta .hero-cta { font-size: 1.125rem; padding: 18px 32px; }
+
+    /* Footer */
+    .footer {
+      padding: 48px 24px 24px;
+      border-top: 1px solid var(--border);
+      background: var(--bg-soft);
+    }
+    .footer .container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 24px;
+    }
+    .footer-links { display: flex; gap: 24px; font-size: 0.875rem; }
+    .footer-links a { color: var(--text-muted); text-decoration: none; }
+    .footer-links a:hover { color: var(--accent); }
+    .footer-meta { font-size: 0.8125rem; color: var(--text-muted); }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <a href="#" class="logo">Нейросети с нуля</a>
+      <nav class="header-nav" style="display:flex;align-items:center;gap:24px;">
+        <a href="#pricing" style="color:var(--text);text-decoration:none;font-size:0.9375rem;">Тарифы</a>
+        <a href="#faq" style="color:var(--text);text-decoration:none;font-size:0.9375rem;">FAQ</a>
+        <a href="#pricing" class="header-cta">Попробовать бесплатно</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- БЛОК 1. Hero — в стиле Magvi -->
+    <section class="hero">
+      <div class="hero-motif" aria-hidden="true"></div>
+      <div class="container">
+        <div class="hero-content">
+          <h1>Нейросети с нуля для работы в офисе</h1>
+          <p class="subtitle">Научитесь за 2 недели делать за 30 минут то, на что раньше уходил целый день. Без программирования. Без технического образования. Только практика, которую вы примените уже завтра.</p>
+          <ul class="hero-bullets">
+            <li>Экономьте 2–3 часа каждый рабочий день</li>
+            <li>Отчёты, письма, презентации, таблицы — на автопилоте</li>
+            <li>Станьте самым ценным сотрудником в отделе</li>
+            <li>Справится даже тот, кто боится слова «нейросеть»</li>
+          </ul>
+          <a href="#pricing" class="hero-cta">Попробовать бесплатно</a>
+          <div class="hero-badge">Старт потока — 1 марта. Осталось 12 мест по спеццене</div>
+        </div>
+        <div class="hero-cards">
+          <div class="hero-card" style="background: linear-gradient(145deg, #667eea 0%, #764ba2 100%);"></div>
+          <div class="hero-card" style="background: linear-gradient(145deg, #f093fb 0%, #f5576c 100%);"></div>
+          <div class="hero-card" style="background: linear-gradient(145deg, #4facfe 0%, #00f2fe 100%);"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- БЛОК 2. Pain -->
+    <section>
+      <div class="container">
+        <h2 class="section-title">Узнаёте себя?</h2>
+        <div class="pain-grid">
+          <div class="pain-card">
+            <h3>Тонете в рутине</h3>
+            <p>Каждый день одни и те же отчёты, письма, сводки. Рабочий день — День сурка.</p>
+          </div>
+          <div class="pain-card">
+            <h3>Не успеваете</h3>
+            <p>Задачи копятся, дедлайны горят, а начальство просит «побыстрее».</p>
+          </div>
+          <div class="pain-card">
+            <h3>Коллеги уже используют ИИ</h3>
+            <p>Кто-то уже автоматизировал работу, а вы чувствуете, что отстаёте.</p>
+          </div>
+          <div class="pain-card">
+            <h3>Пробовали — не поняли</h3>
+            <p>Открывали ChatGPT, написали «Привет», получили ответ — и не знаете, что с этим делать дальше.</p>
+          </div>
+          <div class="pain-card">
+            <h3>Страх остаться за бортом</h3>
+            <p>Все говорят, что ИИ заменит сотрудников. Тревожно.</p>
+          </div>
+        </div>
+        <blockquote class="pain-quote">Нейросети не заменят вас. Вас заменит коллега, который умеет ими пользоваться. Этот курс — чтобы этим коллегой стали <strong>вы</strong>.</blockquote>
+      </div>
+    </section>
+
+    <!-- БЛОК 3. Решение -->
+    <section>
+      <div class="container">
+        <h2 class="section-title">Что вы получите после курса</h2>
+        <ul class="solution-list">
+          <li>
+            <strong>Навык формулировать запросы к ИИ (промпт-инжиниринг)</strong>
+            <span>Вы будете точно знать, как «попросить» нейросеть, чтобы она выдала нужный результат с первого раза.</span>
+          </li>
+          <li>
+            <strong>Готовые шаблоны для офисных задач</strong>
+            <span>Более 50 промптов для писем, отчётов, анализа данных, презентаций, протоколов совещаний.</span>
+          </li>
+          <li>
+            <strong>Скорость × 5</strong>
+            <span>То, на что уходил час — будет занимать 10 минут. С доказанным качеством.</span>
+          </li>
+          <li>
+            <strong>Уверенность в технологиях</strong>
+            <span>Больше никакого «я в этом ничего не понимаю». Вы будете понимать, как это работает — простыми словами.</span>
+          </li>
+          <li>
+            <strong>Преимущество на рынке труда</strong>
+            <span>Строчка «работа с ИИ-инструментами» в резюме — это +30% к привлекательности для работодателя уже сегодня.</span>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- БЛОК 4. Программа -->
+    <section>
+      <div class="container">
+        <h2 class="section-title">Программа курса: от нуля до уверенного пользователя за 14 дней</h2>
+        <ul class="program-list">
+          <li>
+            <div class="program-module-title">Модуль 1. Введение в мир нейросетей</div>
+            <div class="program-module-meta">День 1–2</div>
+            <div class="program-module">
+              <ul>
+                <li>Что такое нейросеть простыми словами (без формул и кода)</li>
+                <li>Обзор инструментов: ChatGPT, Claude, Gemini, YandexGPT — что выбрать и почему</li>
+                <li>Регистрация, настройка, первый запрос</li>
+                <li>Практика: 10 запросов, которые сразу покажут мощь ИИ</li>
+              </ul>
+            </div>
+          </li>
+          <li>
+            <div class="program-module-title">Модуль 2. Промпт-инжиниринг для офиса</div>
+            <div class="program-module-meta">День 3–5</div>
+            <div class="program-module">
+              <ul>
+                <li>7 принципов идеального промпта</li>
+                <li>Роли, контекст, формат вывода — формула запроса</li>
+                <li>Ошибки, из-за которых ИИ выдаёт «воду» — и как их избежать</li>
+                <li>Практика: составляем промпты для 15 реальных рабочих задач</li>
+              </ul>
+            </div>
+          </li>
+          <li>
+            <div class="program-module-title">Модуль 3. Тексты и коммуникация</div>
+            <div class="program-module-meta">День 6–8</div>
+            <div class="program-module">
+              <ul>
+                <li>Деловые письма за 30 секунд: запрос → готовый текст</li>
+                <li>Ответы на жалобы, коммерческие предложения, служебные записки</li>
+                <li>Протоколы совещаний: загружаем запись → получаем готовый документ</li>
+                <li>Переводы, рерайт, адаптация стиля</li>
+                <li>Практика: автоматизируем недельную переписку</li>
+              </ul>
+            </div>
+          </li>
+          <li>
+            <div class="program-module-title">Модуль 4. Таблицы и данные</div>
+            <div class="program-module-meta">День 9–10</div>
+            <div class="program-module">
+              <ul>
+                <li>Формулы Excel/Google Sheets с помощью ИИ</li>
+                <li>Анализ данных: загрузил таблицу → получил выводы</li>
+                <li>Визуализация: графики и дашборды по одному запросу</li>
+                <li>Практика: обрабатываем реальный отчёт за 15 минут вместо 3 часов</li>
+              </ul>
+            </div>
+          </li>
+          <li>
+            <div class="program-module-title">Модуль 5. Презентации и визуал</div>
+            <div class="program-module-meta">День 11–12</div>
+            <div class="program-module">
+              <ul>
+                <li>Структура презентации за 2 минуты</li>
+                <li>Генерация изображений для слайдов (Midjourney, Kandinsky, DALL-E)</li>
+                <li>Оформление без дизайнера: ИИ + Canva / Gamma</li>
+                <li>Практика: создаём презентацию на 15 слайдов «под ключ»</li>
+              </ul>
+            </div>
+          </li>
+          <li>
+            <div class="program-module-title">Модуль 6. Продвинутые сценарии</div>
+            <div class="program-module-meta">День 13–14</div>
+            <div class="program-module">
+              <ul>
+                <li>Автоматизация через связки: ИИ + Google Docs + таблицы + почта</li>
+                <li>Персональный ИИ-ассистент: кастомные инструкции</li>
+                <li>Обзор новинок: что появится завтра и как за этим следить</li>
+                <li>Финальный проект: автоматизируем 1 полный рабочий процесс из вашей реальной работы</li>
+              </ul>
+            </div>
+          </li>
+        </ul>
+        <div class="program-note">Каждый модуль = видеоурок + пошаговый конспект + практическое задание + обратная связь от куратора</div>
+      </div>
+    </section>
+
+    <!-- БЛОК 5. Формат -->
+    <section>
+      <div class="container">
+        <h2 class="section-title">Как проходит обучение</h2>
+        <table class="format-table">
+          <tr>
+            <td><strong>14 видеоуроков</strong></td>
+            <td>Короткие (15–25 мин), по делу, без воды</td>
+          </tr>
+          <tr>
+            <td><strong>Доступ с любого устройства</strong></td>
+            <td>Телефон, планшет, ноутбук — учитесь где удобно</td>
+          </tr>
+          <tr>
+            <td><strong>Практика в каждом уроке</strong></td>
+            <td>Не «посмотрел и забыл», а сразу применяете</td>
+          </tr>
+          <tr>
+            <td><strong>Чат с куратором</strong></td>
+            <td>Задавайте вопросы и получайте помощь в течение 2 часов</td>
+          </tr>
+          <tr>
+            <td><strong>50+ готовых шаблонов</strong></td>
+            <td>Скачиваете и используете на работе уже сегодня</td>
+          </tr>
+          <tr>
+            <td><strong>Доступ навсегда</strong></td>
+            <td>Все материалы остаются у вас. Обновления — бесплатно</td>
+          </tr>
+        </table>
+      </div>
+    </section>
+
+    <!-- БЛОК 6. Для кого -->
+    <section>
+      <div class="container">
+        <h2 class="section-title">Для кого это</h2>
+        <ul class="audience-list">
+          <li><strong>Офисные сотрудники</strong> — менеджеры, администраторы, секретари, помощники руководителей</li>
+          <li><strong>Аналитики и финансисты</strong> — все, кто работает с данными и отчётами</li>
+          <li><strong>Руководители и тимлиды</strong> — кто хочет ускорить свою команду</li>
+          <li><strong>Любой, кто хочет начать с нуля</strong> — возраст, профессия, опыт — не важны</li>
+          <li>НЕ нужно: уметь программировать, разбираться в математике, иметь технический бэкграунд</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- БЛОК 7. До — После -->
+    <section>
+      <div class="container">
+        <h2 class="section-title">Что изменится после курса</h2>
+        <table class="comparison-table">
+          <thead>
+            <tr><th>ДО курса</th><th>ПОСЛЕ курса</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="before">Пишете деловое письмо 20 минут</td><td class="after">Получаете готовое письмо за 30 секунд</td></tr>
+            <tr><td class="before">Сводите отчёт в Excel 3 часа</td><td class="after">ИИ делает это за 10 минут</td></tr>
+            <tr><td class="before">Готовите презентацию полдня</td><td class="after">15 слайдов готовы за 40 минут</td></tr>
+            <tr><td class="before">Боитесь слова «нейросеть»</td><td class="after">Уверенно используете 5+ ИИ-инструментов</td></tr>
+            <tr><td class="before">Вручную ищете информацию</td><td class="after">ИИ собирает, анализирует и оформляет за вас</td></tr>
+            <tr><td class="before">Тревожитесь об автоматизации</td><td class="after">Вы — тот, кто автоматизирует</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- БЛОК 8. Демо -->
+    <section>
+      <div class="container">
+        <h2 class="section-title">Посмотрите, как это работает</h2>
+        <ul class="demo-list">
+          <li>
+            <h4>Пример 1: Деловое письмо</h4>
+            <blockquote>Запрос: «Напиши вежливое письмо поставщику с просьбой перенести срок поставки на 5 дней. Тон — деловой, но не холодный. Компания — «Альфа-Логистик».»<br><br>Результат: готовое письмо на 5 строк — корректное, грамотное, с правильным обращением.</blockquote>
+            <p class="result">Время: 15 секунд.</p>
+          </li>
+          <li>
+            <h4>Пример 2: Формула Excel</h4>
+            <blockquote>Запрос: «Мне нужна формула, которая ищет по столбцу A название товара и возвращает его цену из столбца C.»<br><br>Результат: =ВПР(...) с объяснением каждого аргумента.</blockquote>
+            <p class="result">Больше не нужно гуглить формулы.</p>
+          </li>
+          <li>
+            <h4>Пример 3: Анализ таблицы</h4>
+            <blockquote>Запрос: «Проанализируй эту таблицу продаж за квартал. Найди топ-5 товаров по выручке, укажи динамику и дай рекомендации.»<br><br>Результат: структурированный отчёт с выводами, готовый для руководства.</blockquote>
+            <p class="result">Вместо 2 часов — 5 минут.</p>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- БЛОК 9. Автор -->
+    <section>
+      <div class="container">
+        <h2 class="section-title">Кто ведёт курс</h2>
+        <div class="author-block">
+          <div class="author-avatar" aria-hidden="true"></div>
+          <div>
+            <h3 style="margin:0 0 8px;">[Имя Фамилия]</h3>
+            <p style="margin:0;color:var(--text-muted);font-size:0.9375rem;">Должность/регалии. Обучил(а) X+ человек работе с нейросетями. Опыт в офисной среде — X лет. Использует ИИ в ежедневной работе с [год]. Спикер конференций.</p>
+            <blockquote class="author-quote">«Я создал этот курс для тех, кто хочет работать умнее, а не больше. Всё, чему я учу — я использую каждый день. Здесь нет теории ради теории. Только то, что реально экономит часы.»</blockquote>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- БЛОК 10. Отзывы -->
+    <section>
+      <div class="container">
+        <h2 class="section-title">Что говорят наши ученики</h2>
+        <div class="testimonials-grid">
+          <div class="testimonial-card">
+            <blockquote>«Я бухгалтер, мне 48 лет. Думала, нейросети — это для программистов. После курса я экономлю минимум 1,5 часа в день на отчётах и письмах. Коллеги спрашивают, как я всё успеваю.»</blockquote>
+            <cite>Елена, бухгалтер, Москва</cite>
+          </div>
+          <div class="testimonial-card">
+            <blockquote>«Наконец-то кто-то объяснил это по-человечески! Без заумных терминов. Сразу стал применять на работе. Руководитель заметил и дал проект по автоматизации отдела.»</blockquote>
+            <cite>Дмитрий, менеджер по закупкам, Казань</cite>
+          </div>
+          <div class="testimonial-card">
+            <blockquote>«Больше всего впечатлил модуль с Excel. Я годами мучилась с формулами, а тут просто описываю задачу — и получаю формулу. Магия!»</blockquote>
+            <cite>Ольга, аналитик, Новосибирск</cite>
+          </div>
+          <div class="testimonial-card">
+            <blockquote>«Прошёл курс и поднял себе зарплату. Серьёзно. Показал руководству, как ИИ ускоряет процессы — мне расширили функционал и пересмотрели оклад.»</blockquote>
+            <cite>Артём, помощник директора, Санкт-Петербург</cite>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- БЛОК 11. Тарифы -->
+    <section id="pricing">
+      <div class="container">
+        <h2 class="section-title">Выберите свой тариф</h2>
+        <p class="section-subtitle">Уже записалось 247 человек</p>
+        <div class="pricing-grid">
+          <div class="pricing-card">
+            <h3>Базовый</h3>
+            <div class="price"><s>5 900 ₽</s> 3 900 ₽</div>
+            <ul>
+              <li>Видеоуроки (14 шт.)</li>
+              <li>50+ шаблонов промптов</li>
+              <li>Доступ навсегда</li>
+              <li class="no">Чат с куратором</li>
+              <li class="no">Проверка заданий</li>
+              <li class="no">Сертификат</li>
+            </ul>
+            <a href="#" class="btn secondary">Записаться →</a>
+          </div>
+          <div class="pricing-card featured">
+            <h3>Оптимальный ⭐</h3>
+            <div class="price"><s>9 900 ₽</s> 6 900 ₽</div>
+            <ul>
+              <li>Видеоуроки (14 шт.)</li>
+              <li>50+ шаблонов промптов</li>
+              <li>Доступ навсегда</li>
+              <li>Чат с куратором (30 дней)</li>
+              <li>Проверка заданий</li>
+              <li>Сертификат</li>
+              <li class="no">3 личных созвона</li>
+              <li class="no">Индивидуальный план</li>
+            </ul>
+            <a href="#" class="btn">⭐ Записаться →</a>
+          </div>
+          <div class="pricing-card">
+            <h3>Премиум</h3>
+            <div class="price"><s>19 900 ₽</s> 14 900 ₽</div>
+            <ul>
+              <li>Всё из тарифа «Оптимальный»</li>
+              <li>Чат с куратором (60 дней)</li>
+              <li>3 личных созвона с экспертом</li>
+              <li>Индивидуальный план автоматизации</li>
+            </ul>
+            <a href="#" class="btn secondary">Записаться →</a>
+          </div>
+        </div>
+        <p class="pricing-note">Рассрочка 0% на 4 месяца от банка-партнёра</p>
+      </div>
+    </section>
+
+    <!-- БЛОК 12. Гарантия -->
+    <section>
+      <div class="container">
+        <h2 class="section-title">Гарантия результата</h2>
+        <div class="guarantee-block">
+          <h3>Возврат 100% в течение 7 дней</h3>
+          <p>Если после первых 7 дней обучения вы поймёте, что курс вам не подходит — мы вернём всю сумму. Без вопросов, без обид, без мелкого шрифта. Мы уверены в качестве — поэтому даём такую гарантию.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- БЛОК 13. FAQ -->
+    <section id="faq">
+      <div class="container">
+        <h2 class="section-title">Часто задаваемые вопросы</h2>
+        <ul class="faq-list">
+          <li>
+            <h4>У меня совсем нет опыта. Я справлюсь?</h4>
+            <p>Курс создан именно для новичков. Мы идём с нуля: от регистрации в сервисе до продвинутых сценариев. 93% наших учеников не имели опыта с ИИ.</p>
+          </li>
+          <li>
+            <h4>Нужно ли устанавливать программы?</h4>
+            <p>Нет. Все инструменты работают в браузере. Нужен только интернет и любое устройство.</p>
+          </li>
+          <li>
+            <h4>Сколько времени в день нужно на учёбу?</h4>
+            <p>30–60 минут в день. Уроки короткие, практика — на ваших реальных задачах.</p>
+          </li>
+          <li>
+            <h4>Курс подойдёт руководителям?</h4>
+            <p>Да. Отдельно показываем, как внедрять ИИ в работу команды и какие процессы автоматизировать в первую очередь.</p>
+          </li>
+          <li>
+            <h4>Будут ли обновления?</h4>
+            <p>Да. Мир ИИ меняется быстро — мы обновляем материалы и высылаем дополнения бесплатно всем ученикам.</p>
+          </li>
+          <li>
+            <h4>Как оплатить?</h4>
+            <p>Карта, рассрочка, оплата от юрлица — все варианты доступны.</p>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- БЛОК 14. Финальный CTA -->
+    <section class="final-cta">
+      <div class="container">
+        <h2 class="section-title">Перестаньте тратить часы на то, что ИИ делает за минуты</h2>
+        <p>Через 2 недели вы будете работать быстрее, увереннее и ценнее — или мы вернём деньги.</p>
+        <a href="#pricing" class="hero-cta">Записаться на курс →</a>
+        <p style="margin-top:1rem;font-size:0.9375rem;">Старт — 1 марта. Количество мест ограничено.</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- БЛОК 15. Footer -->
+  <footer class="footer">
+    <div class="container">
+      <a href="#" class="logo">Нейросети с нуля</a>
+      <div class="footer-links">
+        <a href="#">Политика конфиденциальности</a>
+        <a href="#">Оферта</a>
+        <a href="#">Реквизиты</a>
+        <a href="mailto:hello@example.com">hello@example.com</a>
+        <a href="#">Telegram</a>
+      </div>
+      <div class="footer-meta">ИП [название], ИНН [номер]. © 2025</div>
+    </div>
+  </footer>
+</body>
+</html>
